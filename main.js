@@ -4,6 +4,7 @@ class App {
     //numeros iniciais
     numeros = [7, 3, 4, 6, 2, 5, 8, 9, 1];
     numElementos = [];
+    opcoesElementos = [];
 
     //elementos
     container = document.querySelector("main");
@@ -17,16 +18,58 @@ class App {
     tipoOrdenamentoAtual = 'bubble-sort';
 
 
+     /*
+     ========================================
+     ========================================
+
+     Métodos de controle abaixo
+
+     ========================================
+     ========================================
+    */
 
     //inicializando a aplicação
     configurar(){
         //destacando o ordenamento ativo
         const opcoes = Array.from(document.querySelectorAll("li"));
         for(let opcao of opcoes){
-            if(opcao.classList.contains(this.tipoOrdenamentoAtual))
-                opcao.classList.add("ativo")
+            this.opcoesElementos.push(opcao);
         }
 
+        this.resetar();
+        this.destacarOpcaoDeOrdenamento();
+
+        //adicionando os listeners dos botões
+        this.botaoOrdenar.addEventListener('click', this.ordenar.bind(this));
+        this.botaoResetar.addEventListener('click', this.resetar.bind(this));
+
+        //adicionando o listener de troca de oção de ordenamento (event delegation)
+        this.controle.addEventListener('click', (e) => {
+            if(e.target.closest('li')?.classList.contains('opcao-ordenamento')){
+                this.tipoOrdenamentoAtual = e.target.closest('li').classList[1];
+                this.destacarOpcaoDeOrdenamento();
+            }
+        });
+    }
+
+    //detaca a opão de ordenamento atual
+    destacarOpcaoDeOrdenamento(){
+        for(let opcao of this.opcoesElementos){
+            //garantingo que duas opções diferentes não vão ficar ativas
+            opcao.classList.remove('ativo');
+
+            if(opcao.classList.contains(this.tipoOrdenamentoAtual)){
+                opcao.classList.add('ativo')
+            }
+        }
+    }
+
+    //retorna os númeors à sua posição inicial
+    resetar(){
+        //removendo elementos atuais
+        this.numElementos = [];
+
+        
         //criando e adicionando os elementos com base no número
         this.numeros.forEach((num, i) => {       
             this.numElementos.push(new NumElemento(num, i));
@@ -39,20 +82,9 @@ class App {
 
         //adicionando o html dos elementos no container
         this.container.replaceChildren(...elementos);
-
-        //adicionando os listeners dos botões
-        this.botaoOrdenar.addEventListener('click', this.ordenar.bind(this));
-        this.botaoResetar.addEventListener('click', this.resetar.bind(this));
-    }
-
-    //retorna os númeors à sua posição inicial
-    resetar(){
-        //removendo elementos atuais
-        this.numElementos = [];
-
-        this.configurar();
     }
     
+    //chama o método correto de ordenamento com base no tipo atual
     ordenar(){
         switch(this.tipoOrdenamentoAtual){
             case 'bubble-sort':
@@ -62,11 +94,13 @@ class App {
         }
     }
 
+    //esconde o painel de controle
     esconderControle(){
         this.controle.style.opacity = '0';
         setTimeout(() => this.controle.style.display = 'none', 300);
     }
 
+    //torna visível o painel de controel
     mostrarControle(){
         this.controle.style.display = 'flex';
         setTimeout(() => this.controle.style.opacity = '1', 100);
@@ -76,6 +110,16 @@ class App {
     async delay(mileseconds){
         return new Promise(resolve => setTimeout(resolve, mileseconds));
     }
+
+    /*
+     ========================================
+     ========================================
+
+     Métodos de ordenamento abaixo
+
+     ========================================
+     ========================================
+    */
 
     //ordenamento via bubble sort
     async bubbleSort(){
@@ -122,4 +166,5 @@ class App {
 }
 
 
+//iniciando a aplicação
 window.addEventListener("load", new App().configurar());
