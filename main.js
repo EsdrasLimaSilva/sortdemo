@@ -91,6 +91,10 @@ class App {
                 this.esconderControle();
                 this.bubbleSort();
                 break;
+            case 'inserction-sort':
+                this.esconderControle();
+                this.inserctionSort();
+                break;
         }
     }
 
@@ -133,7 +137,7 @@ class App {
                 
                 //destacando o elemento
                 this.numElementos[i].ativar();
-                await this.delay(500)
+                await this.delay(1000)
 
                 //verificando se o próximo elemento é maior
                 if(this.numElementos[i].valor > this.numElementos[i+1].valor){
@@ -161,6 +165,50 @@ class App {
         }while(trocado);
 
         //tornando os controles visíveis
+        this.mostrarControle();
+    }
+
+    //ordenamento via inserction sort
+    async inserctionSort(){
+
+        for(let i = 0; i < this.numElementos.length; i++){
+            let atual = this.numElementos[i];
+
+            atual.ativar();
+            await this.delay(1000);
+
+            //coletando o predecessor
+            let indicePredecessor = i - 1;
+            let predecessor = this.numElementos[indicePredecessor];
+
+            while(indicePredecessor >= 0 && predecessor.valor > atual.valor){
+                predecessor.ativar();
+                await this.delay(1000);
+
+                //realizando o swap
+                let aux = this.numElementos[atual.indice];
+                this.numElementos[atual.indice] = this.numElementos[predecessor.indice];
+                this.numElementos[predecessor.indice]= aux;
+
+                //atualizando os indices
+                predecessor.atualizarIndice(atual.indice);
+                atual.atualizarIndice(indicePredecessor);
+
+
+                await this.delay(100);
+                predecessor.desativar();
+
+                //atualizando o predecessor
+                predecessor = this.numElementos[--indicePredecessor];
+
+
+
+            }
+
+            atual.desativar();
+
+        }
+
         this.mostrarControle();
     }
 }

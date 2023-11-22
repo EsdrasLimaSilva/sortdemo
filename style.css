@@ -46,7 +46,7 @@ main {
     border: 2px solid black;
     position: absolute;
     top: 4px;
-    left: 4px;
+    left: 1000px;
     z-index: 10;
     list-style-type: none;
     padding: 16px;
