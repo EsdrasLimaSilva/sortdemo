@@ -18,7 +18,7 @@ class NumElemento {
         this.posicao.y = 10;
 
         //configurando a altura
-        this.altura = valor * 12 + 32;
+        this.altura = valor * 30 + 32;
 
         //configurando o elemento
         this.elemento = document.createElement("div");

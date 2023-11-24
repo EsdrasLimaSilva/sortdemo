@@ -2,7 +2,7 @@ import NumElemento from "./numElemento.js";
 
 class App {
     //numeros iniciais
-    numeros = [7, 3, 4, 6, 2, 5, 8, 9, 1];
+    numeros = [9, 3, 2, 5, 8, 4, 6, 1, 7];
     numElementos = [];
     opcoesElementos = [];
 
@@ -95,6 +95,14 @@ class App {
                 this.esconderControle();
                 this.inserctionSort();
                 break;
+            case 'merge-sort':
+                this.esconderControle();
+                this.mergeSort();
+                break;
+            case 'quick-sort':
+                this.esconderControle();
+                this.quickSort();
+                break;
         }
     }
 
@@ -137,7 +145,7 @@ class App {
                 
                 //destacando o elemento
                 this.numElementos[i].ativar();
-                await this.delay(1000)
+                await this.delay(500)
 
                 //verificando se o próximo elemento é maior
                 if(this.numElementos[i].valor > this.numElementos[i+1].valor){
@@ -145,7 +153,7 @@ class App {
 
                     //ativando o elemento
                     this.numElementos[i+1].ativar();
-                    await this.delay(1000);
+                    await this.delay(500);
 
 
                     //atualizando os índices e posições gráficas
@@ -175,15 +183,16 @@ class App {
             let atual = this.numElementos[i];
 
             atual.ativar();
-            await this.delay(1000);
+            await this.delay(500);
 
             //coletando o predecessor
             let indicePredecessor = i - 1;
             let predecessor = this.numElementos[indicePredecessor];
+            
 
             while(indicePredecessor >= 0 && predecessor.valor > atual.valor){
                 predecessor.ativar();
-                await this.delay(1000);
+                await this.delay(500);
 
                 //realizando o swap
                 let aux = this.numElementos[atual.indice];
@@ -195,7 +204,6 @@ class App {
                 atual.atualizarIndice(indicePredecessor);
 
 
-                await this.delay(100);
                 predecessor.desativar();
 
                 //atualizando o predecessor
@@ -208,6 +216,130 @@ class App {
             atual.desativar();
 
         }
+
+        this.mostrarControle();
+    }
+
+
+    async merge(inicio, fim)
+    {
+        for(let k = inicio; k <= fim; k++)
+            this.numElementos[k].elemento.style.opacity = 1;
+
+        for(let i = inicio; i <= fim; i++){
+            this.numElementos[i].ativar();
+            await this.delay(500);
+
+            for(let j = i+1; j <= fim; j++){
+                this.numElementos[j].ativar();
+                await this.delay(500);
+
+                if(this.numElementos[j].valor < this.numElementos[i].valor){
+                    this.numElementos[i].atualizarIndice(j);
+                    this.numElementos[j].atualizarIndice(i);
+
+                    let aux = this.numElementos[i];
+                    this.numElementos[i] = this.numElementos[j];
+                    this.numElementos[j] = aux;
+
+         
+                }
+
+                this.numElementos[j].desativar();
+            }
+
+            this.numElementos[i].desativar();
+        }
+
+        for(let k = inicio; k <= fim; k++)
+            this.numElementos[k].elemento.style.opacity = 0.3;
+    
+    }
+     
+
+    async mergeDivide(inicio, fim){
+        if(inicio < fim){
+            let meio = inicio + Math.floor((fim - inicio) / 2);
+            await this.mergeDivide(inicio, meio);
+            await this.mergeDivide(meio+1, fim);
+
+            await this.merge(inicio, fim);
+        }
+    }
+
+    //ordenando via merge sort
+    async mergeSort(){
+        for(let numEl of this.numElementos)
+            numEl.elemento.style.opacity = 0.3;
+        
+        await this.mergeDivide(0, this.numElementos.length -1);
+        this.mostrarControle();
+
+        for(let numEl of this.numElementos)
+            numEl.elemento.style.opacity = 1;
+    }
+
+    async quick(inicio, fim){
+       if(inicio < fim){
+            let i = inicio -1;
+            const pivo = this.numElementos[fim];
+            pivo.ativar();
+
+            for(let j = inicio; j <= fim; j++ ){
+                this.numElementos[j].ativar();
+                await this.delay(500);
+                this.numElementos[j].desativar();
+
+
+                if(this.numElementos[j].valor < pivo.valor){
+
+
+                    i++;
+                    this.numElementos[i].ativar();
+                    this.numElementos[j].ativar();
+                    await this.delay(500);
+                    this.numElementos[i].desativar();
+                    this.numElementos[j].desativar();
+
+
+                    this.numElementos[i].atualizarIndice(j);
+                    this.numElementos[j].atualizarIndice(i);
+
+                    //fazendo o swap
+                    let aux = this.numElementos[i];
+                    this.numElementos[i] = this.numElementos[j];
+                    this.numElementos[j] = aux;
+                }
+
+                if(j == fim){
+                    i++;
+
+                    this.numElementos[i].atualizarIndice(j);
+                    this.numElementos[j].atualizarIndice(i);
+                    await this.delay(300);
+
+                    let aux = this.numElementos[i];
+                    this.numElementos[i] = pivo;
+                    this.numElementos[j] = aux;
+
+                    pivo.elemento.style.opacity = 0.3;
+
+                }
+
+            }
+
+            pivo.desativar();
+
+            await this.quick(inicio, i-1);
+            await this.quick(i+1, fim);
+       }
+    }
+
+    async quickSort(){
+        await this.quick(0, this.numElementos.length - 1);
+
+        for(let numEl of this.numElementos)
+            numEl.elemento.style.opacity = 1;
 
         this.mostrarControle();
     }
