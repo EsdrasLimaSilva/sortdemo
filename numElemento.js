@@ -4,11 +4,11 @@ class NumElemento {
     elemento;
     posicao = {
         x: 0,
-        y: 0
-    }
+        y: 0,
+    };
     altura;
 
-    constructor(valor, indice){
+    constructor(valor, indice) {
         //configurando o valor e indice
         this.valor = valor;
         this.indice = indice;
@@ -26,23 +26,31 @@ class NumElemento {
         this.elemento.classList.add("numero");
 
         //posicionando
-        this.elemento.style.position = 'absolute';
+        this.elemento.style.position = "absolute";
         this.elemento.style.left = `${this.posicao.x}px`;
         this.elemento.style.top = `${this.posicao.y}px`;
         this.elemento.style.height = `${this.altura}px`;
     }
 
-    atualizarIndice(novoIndice){
+    atualizarIndice(novoIndice) {
         this.indice = novoIndice;
         this.posicao.x = this.indice * 100 + 100;
         this.elemento.style.left = `${this.posicao.x}px`;
     }
 
-    ativar(){
+    moveDown() {
+        this.elemento.style.top = "320px";
+    }
+
+    moveUp() {
+        this.elemento.style.top = "4px";
+    }
+
+    ativar() {
         this.elemento.classList.add("numero-ativo");
     }
 
-    desativar(){
+    desativar() {
         this.elemento.classList.remove("numero-ativo");
     }
 }

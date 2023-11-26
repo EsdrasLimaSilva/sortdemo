@@ -2,7 +2,7 @@ import NumElemento from "./numElemento.js";
 
 class App {
     //numeros iniciais
-    numeros = [9, 3, 2, 5, 8, 4, 6, 1, 7];
+    numeros = [9, 3, 2, 5, 8, 7, 6, 1, 4];
     numElementos = [];
     opcoesElementos = [];
 
@@ -205,35 +205,79 @@ class App {
         this.mostrarControle();
     }
 
-    async merge(inicio, fim) {
-        for (let k = inicio; k <= fim; k++)
+    async merge(inicio, meio, fim) {
+        //ativando o subvetor
+        for (let k = inicio; k <= fim; k++) {
             this.numElementos[k].elemento.style.opacity = 1;
-
-        for (let i = inicio; i <= fim; i++) {
-            this.numElementos[i].ativar();
-            await this.delay(500);
-
-            for (let j = i + 1; j <= fim; j++) {
-                this.numElementos[j].ativar();
-                await this.delay(500);
-
-                if (this.numElementos[j].valor < this.numElementos[i].valor) {
-                    this.numElementos[i].atualizarIndice(j);
-                    this.numElementos[j].atualizarIndice(i);
-
-                    let aux = this.numElementos[i];
-                    this.numElementos[i] = this.numElementos[j];
-                    this.numElementos[j] = aux;
-                }
-
-                this.numElementos[j].desativar();
-            }
-
-            this.numElementos[i].desativar();
+            this.numElementos[k].moveDown();
         }
 
-        for (let k = inicio; k <= fim; k++)
+        await this.delay(300);
+
+        const tamanhoVetorEsquerdo = meio - inicio + 1;
+        const tamanhoVetorDireito = fim - meio;
+
+        const vetorEsquerdo = [];
+        const vetorDireito = [];
+
+        for (let i = 0; i < tamanhoVetorEsquerdo; i++)
+            vetorEsquerdo[i] = this.numElementos[inicio + i];
+        for (let i = 0; i < tamanhoVetorDireito; i++)
+            vetorDireito[i] = this.numElementos[meio + 1 + i];
+
+        let indiceEsquerdo = 0;
+        let indiceDireito = 0;
+        let k = inicio;
+
+        while (
+            indiceEsquerdo < tamanhoVetorEsquerdo &&
+            indiceDireito < tamanhoVetorDireito
+        ) {
+            let elEsquerdo = vetorEsquerdo[indiceEsquerdo];
+            let elDireito = vetorDireito[indiceDireito];
+
+            elEsquerdo.ativar();
+            elDireito.ativar();
+            await this.delay(500);
+
+            if (
+                vetorEsquerdo[indiceEsquerdo].valor <
+                vetorDireito[indiceDireito].valor
+            ) {
+                vetorEsquerdo[indiceEsquerdo].atualizarIndice(k);
+                vetorEsquerdo[indiceEsquerdo].moveUp();
+                await this.delay(500);
+                this.numElementos[k++] = vetorEsquerdo[indiceEsquerdo++];
+            } else {
+                vetorDireito[indiceDireito].atualizarIndice(k);
+                vetorDireito[indiceDireito].moveUp();
+                await this.delay(500);
+                this.numElementos[k++] = vetorDireito[indiceDireito++];
+            }
+
+            elEsquerdo.desativar();
+            elDireito.desativar();
+        }
+
+        while (indiceEsquerdo < tamanhoVetorEsquerdo) {
+            vetorEsquerdo[indiceEsquerdo].atualizarIndice(k);
+            vetorEsquerdo[indiceEsquerdo].moveUp();
+            await this.delay(500);
+            this.numElementos[k++] = vetorEsquerdo[indiceEsquerdo++];
+        }
+
+        while (indiceDireito < tamanhoVetorDireito) {
+            vetorDireito[indiceDireito].atualizarIndice(k);
+            vetorDireito[indiceDireito].moveUp();
+            await this.delay(500);
+            this.numElementos[k++] = vetorDireito[indiceDireito++];
+        }
+
+        //desativando o subvetor
+        for (let k = inicio; k <= fim; k++) {
             this.numElementos[k].elemento.style.opacity = 0.3;
+            this.numElementos[k].moveUp();
+        }
     }
 
     async mergeDivide(inicio, fim) {
@@ -242,7 +286,7 @@ class App {
             await this.mergeDivide(inicio, meio);
             await this.mergeDivide(meio + 1, fim);
 
-            await this.merge(inicio, fim);
+            await this.merge(inicio, meio, fim);
         }
     }
 
